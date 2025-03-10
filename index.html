@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI PDF Explainer</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI PDF Explainer</h1>
+        
+        <div class="upload-section">
+            <input type="file" id="pdfUpload" accept="application/pdf">
+            <button onclick="uploadPDF()">Upload</button>
+        </div>
+        
+        <div class="query-section">
+            <input type="text" id="query" placeholder="Ask a question about the PDF">
+            <button onclick="askQuestion()">Ask</button>
+        </div>
+        
+        <div id="response" class="response-box"></div>
+    </div>
+    
+    <script>
+        function uploadPDF() {
+            let fileInput = document.getElementById("pdfUpload");
+            let file = fileInput.files[0];
+            
+            if (!file) {
+                alert("Please select a PDF file");
+                return;
+            }
+            
+            let formData = new FormData();
+            formData.append("file", file);
+            
+            fetch("/upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error("Error:", error));
+        }
+        
+        function askQuestion() {
+            let query = document.getElementById("query").value;
+            
+            if (!query) {
+                alert("Please enter a question");
+                return;
+            }
+            
+            fetch("/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => document.getElementById("response").innerText = data.response)
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
